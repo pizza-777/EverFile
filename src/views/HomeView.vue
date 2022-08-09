@@ -20,9 +20,9 @@
                  <b-button variant="outline-secondary" @click="_uploadFile()">Upload</b-button>
                 </div>                
                 </div>
-                <div class="row mt-4">
+                <div class="row mt-4" v-if="showProgress">
                 <div class="col-md-12">
-                <b-progress v-if="showProgress" :value="value" :max="max" show-progress animated></b-progress>
+                <b-progress :value="value" :max="max" show-progress animated></b-progress>
                 </div>                
                 </div>
                 <div class="row mt-4">
@@ -59,7 +59,10 @@ export default Vue.extend({
       this.file = ev.target.files[0];            
     },
     async _uploadFile() {      
-      if(this.file == false) return;                
+      if(this.file == false) {
+        alert('Please select a file');
+        return;
+      }                
     
       const fileAddress = await uploadFile(this.file);
 
