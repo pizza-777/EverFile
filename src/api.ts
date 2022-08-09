@@ -47,7 +47,7 @@ async function everWallet(): Promise<everWallet | never> {
   return _accountInteraction;
 }
 
-export async function uploadFile(fileInfo: File): Promise<string | undefined> {
+export async function uploadFile(fileInfo: File): Promise<string | undefined> {  
   const everProvider = await ever();
   const accountInteraction = await everWallet();
   const fileAddress: string = genRandomAddress()
@@ -60,7 +60,7 @@ export async function uploadFile(fileInfo: File): Promise<string | undefined> {
       {
         name: fileInfo.name,
         size: String(fileInfo.size),
-        type: fileInfo.type,
+        type: fileInfo.type == '' ? 'Unknown' : fileInfo.type,
       }).send({
         from: accountInteraction.address,
         amount: '1',
