@@ -15,6 +15,18 @@
                     </div>
                 </div>                
                 </div>
+                <div class="row mt-4">
+                <div class="col-md-12">
+                 <b-button variant="outline-secondary" @click="_uploadFile()">Upload</b-button>
+                </div>                
+                </div>
+                <div class="row mt-4">
+                <div class="col-md-12">
+                 <div variant="outline-secondary">
+                    <a v-if="fileAddress" :href="'./#/file/' + fileAddress">Go to file</a>
+                 </div>
+                </div>                
+                </div>
             </div>
             </div>
         </div>
@@ -24,25 +36,30 @@
 </template>
 <script lang="ts">
 import Vue from 'vue';
+import { uploadFile } from '@/api.ts';
 
 export default Vue.extend({
   name: 'HomeView',
   data() {
     return {      
-          image: false
+          fileAddress: false,
+          file: false,
         }
     },
   methods: {
     loadFile(ev) {     
-      const file = ev.target.files[0];  
-      console.log('filesize', file.size)    
+      this.file = ev.target.files[0];       
       const reader = new FileReader();
       reader.onloadend = function() {
-          this.image = reader.result;  
-          document.getElementById("img").src=this.image;
+          const res = reader.result;                     
         }    
-          reader.readAsDataURL(file);
-      }
+          reader.readAsDataURL(this.file);
+      },
+    async _uploadFile() {      
+      if(this.file == false) return;    
+      
+      this.fileAddress = await uploadFile(this.file);
+    }
   }
 });
 
