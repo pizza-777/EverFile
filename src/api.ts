@@ -1,6 +1,7 @@
 import {
   Address,
-  ProviderRpcClient
+  ProviderRpcClient,
+  ReadonlyAbiParam
 } from 'everscale-inpage-provider';
 
 import { EverscaleStandaloneClient } from 'everscale-standalone-client';
@@ -15,7 +16,7 @@ const _everStandalone = new ProviderRpcClient({
     EverscaleStandaloneClient.create({
       connection: 'local',
     }),
-      forceUseFallback: true,
+  forceUseFallback: true,
 });
 
 async function ever(): Promise<ProviderRpcClient> | never {
@@ -46,7 +47,7 @@ async function everWallet(): Promise<everWallet | never> {
   return _accountInteraction;
 }
 
-export async function uploadFile(fileInfo: File): Promise<string|undefined> {
+export async function uploadFile(fileInfo: File): Promise<string | undefined> {
   const everProvider = await ever();
   const accountInteraction = await everWallet();
   const fileAddress: string = genRandomAddress()
@@ -54,17 +55,17 @@ export async function uploadFile(fileInfo: File): Promise<string|undefined> {
     FileContract.abi,
     new Address(fileAddress)
   );
-  try {            
-    const tr = await fileContractObject.methods.upload(
+  try {
+    await fileContractObject.methods.upload(
       {
         name: fileInfo.name,
         size: String(fileInfo.size),
         type: fileInfo.type,
       }).send({
-      from: accountInteraction.address,
-      amount: '1',
-      bounce: true
-    })
+        from: accountInteraction.address,
+        amount: '1',
+        bounce: true
+      })
     return fileAddress;
   } catch (e: unknown) {
     console.error(e);
@@ -80,18 +81,24 @@ function genRandomAddress(): string {
   return address;
 }
 
-export async function getFile(fileId: string): Promise<FileInfo | undefined>{
+export async function getFileInfo(fileId: string): Promise<FileInfo | undefined> {
 
   try {
     const transactions = (await _everStandalone.getTransactions({
       address: new Address(fileId),
     })).transactions
 
-    if(transactions.length == 0) return undefined;
+    if (transactions.length == 0) return undefined;
+    //first transaction is about file 
+    const data = await decodeBody(
+      transactions[transactions.length - 1].inMessage.body?.toString() ?? '',
+      [
+        { "name": "name", "type": "string" },
+        { "name": "size", "type": "string" },
+        { "name": "type", "type": "string" },
+      ]);
 
-    const data = await decodeBody(transactions[0].inMessage.body?.toString() ?? '');
-
-    if(typeof data == 'undefined') return;    
+    if (typeof data == 'undefined') return;
     return data
 
   } catch (e: unknown) {
@@ -100,21 +107,48 @@ export async function getFile(fileId: string): Promise<FileInfo | undefined>{
   }
 }
 
-async function decodeBody(body: string): Promise<FileInfo | undefined> {
+async function decodeBody(body: string, structure: readonly ReadonlyAbiParam[]): Promise<FileInfo | undefined> {
   const everProvider = _everStandalone;
   try {
     const message = await everProvider.unpackFromCell({
-      structure: [
-        { "name": "name", "type": "string" },
-        { "name": "size", "type": "string" },
-        { "name": "type", "type": "string" },     
-      ],
+      structure: structure,
       boc: body,
       allowPartial: true
     });
 
     return message.data;
   } catch (e) {
+    console.error(e);
+  }
+}
+export const createChunks = (base64: string, cSize: number) => {
+  let startPointer = 0;
+  const endPointer = base64.length;
+  const chunks = [];
+  while (startPointer < endPointer) {
+    const newStartPointer = startPointer + cSize;
+    chunks.push(base64.slice(startPointer, newStartPointer));
+    startPointer = newStartPointer;
+  }
+  return chunks;
+}
+
+export const uploadChunk = async (fileId: string, chunk: string, chunkNumber: number) => {
+  const everProvider = await ever();
+  const fileContractObject = new everProvider.Contract(
+    FileContract.abi,
+    new Address(fileId)
+  );
+  try {
+    await fileContractObject.methods.uploadChunk(
+      {
+        chunk: chunk,
+        chunkNumber: String(chunkNumber),
+      }).sendExternal({
+        publicKey: '0x0',
+        withoutSignature: true,
+      })
+  } catch (e: unknown) {
     console.error(e);
   }
 }

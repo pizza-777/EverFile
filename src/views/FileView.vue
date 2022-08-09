@@ -20,7 +20,7 @@
 </template>
 <script>
 import Vue from 'vue';
-import {getFile} from '@/api';
+import {getFileInfo} from '@/api';
 
 export default Vue.extend({
   name: 'FileView',
@@ -31,7 +31,7 @@ export default Vue.extend({
     };
   },
     mounted(){
-        getFile(this.$route.params.fileId).then(file => {                    
+        getFileInfo(this.$route.params.fileId).then(file => {                    
             if(typeof file === 'undefined'){
                 this.error = 'Not found';
             }else{
