@@ -22,6 +22,11 @@
                 </div>
                 <div class="row mt-4">
                 <div class="col-md-12">
+                <b-progress v-if="showProgress" :value="value" :max="max" show-progress animated></b-progress>
+                </div>                
+                </div>
+                <div class="row mt-4">
+                <div class="col-md-12">
                  <div variant="outline-secondary">
                     <a v-if="fileAddress" :href="'./#/file/' + fileAddress">Go to file</a>
                  </div>
@@ -43,7 +48,10 @@ export default Vue.extend({
   data() {
     return {      
           fileAddress: false,
-          file: false,          
+          file: false,
+          max: 100,//progress bar max value
+          value: 0,//progress bar value    
+          showProgress: false,//show progress bar                
         }
     },
   methods: {
@@ -55,30 +63,46 @@ export default Vue.extend({
     
       const fileAddress = await uploadFile(this.file);
 
-      const reader = new FileReader();
-    
-      reader.onloadend = function() {
-        const base64 = reader.result;       
-        const chunks = createChunks(base64, 100)
-
-        for(let i = 0; i < chunks.length; i++) {
-          uploadChunk(fileAddress, chunks[i], i);         
+      if(typeof fileAddress === 'undefined') return
+      let base64:string;
+      try{
+        base64 = await readUploadedFileAsBase64(this.file)  
+      }catch(e){
+        console.warn(e.message)
+      }      
+     
+        const chunks = createChunks(base64, 1024)
+        if(chunks.length > 1){
+          this.showProgress = true;
         }
-        // console.log('chunks', chunks)
-        // console.log('file', file)
-        // console.log('fileAddress', fileAddress)
+        this.max = chunks.length-1;//progress bar
 
-      }    
+        for(let i = 0; i < chunks.length; i++) {        
+          await uploadChunk(fileAddress, chunks[i], i);         
+          this.value = i;
+        }
 
-      reader.onerror = function() {
-        console.log(reader.error);
-      };
-    
-      reader.readAsDataURL(this.file);    
-    
+        this.showProgress = false;
+       
       this.fileAddress = fileAddress;
     }
   }
 });
 
+const readUploadedFileAsBase64 = (inputFile) => {
+  console.log(inputFile)
+  const temporaryFileReader = new FileReader();
+
+  return new Promise((resolve, reject) => {
+    temporaryFileReader.onerror = () => {
+      temporaryFileReader.abort();
+      reject(new DOMException("Problem parsing input file."));
+    };
+
+    temporaryFileReader.onload = () => {
+      resolve(temporaryFileReader.result);
+    };
+    temporaryFileReader.readAsDataURL(inputFile);
+  });
+};
 </script>
