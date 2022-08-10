@@ -22,13 +22,13 @@
                 </div>
                 <div class="row mt-4" v-if="showProgress">
                 <div class="col-md-12">
-                <b-progress :value="value" :max="max" show-progress animated></b-progress>
+                <b-progress variant="secondary" :value="value" :max="max" show-progress animated></b-progress>
                 </div>                
                 </div>
                 <div class="row mt-4">
                 <div class="col-md-12">
                  <div variant="outline-secondary">
-                    <a v-if="fileAddress" :href="'./#/file/' + fileAddress">Go to file</a>
+                    <a v-if="fileAddress" :href="'./#/file/' + fileAddress" class="link-secondary">Go to file</a>
                  </div>
                 </div>                
                 </div>
