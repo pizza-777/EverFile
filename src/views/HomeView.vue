@@ -86,7 +86,8 @@ export default Vue.extend({
           await uploadChunk(fileAddress, chunks[i], i);         
           this.value = i;
         }
-
+        //final chunk -- neede for recognizing the end of file chunks
+        await uploadChunk(fileAddress, '', 0);
         this.showProgress = false;
         this.disableInputs = false;
         document.getElementById('fileUpload').value = '';
