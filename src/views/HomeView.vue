@@ -11,13 +11,13 @@
                 <div class="row">
                 <div class="col-md-12">
                     <div class="form-group">                   
-                    <input type="file" class="form-control" id="fileUpload" name="fileUpload" @change = "loadFile">
+                    <input type="file" class="form-control" id="fileUpload" name="fileUpload" @change = "loadFile" :disabled="disableInputs">
                     </div>
                 </div>                
                 </div>
                 <div class="row mt-4">
                 <div class="col-md-12">
-                 <b-button variant="outline-secondary" @click="_uploadFile()">Upload</b-button>
+                 <b-button variant="outline-secondary" @click="_uploadFile()" :disabled="disableInputs">Upload</b-button>
                 </div>                
                 </div>
                 <div class="row mt-4" v-if="showProgress">
@@ -51,7 +51,8 @@ export default Vue.extend({
           file: false,
           max: 100,//progress bar max value
           value: 0,//progress bar value    
-          showProgress: false,//show progress bar                
+          showProgress: false,//show progress bar     
+          disableInputs: false,//disable inputs           
         }
     },
   methods: {
@@ -74,9 +75,10 @@ export default Vue.extend({
         console.warn(e.message)
       }      
      
-        const chunks = createChunks(base64, 1024)
+        const chunks = createChunks(base64, 15000)
         if(chunks.length > 1){
           this.showProgress = true;
+          this.disableInputs = true;
         }
         this.max = chunks.length-1;//progress bar
 
@@ -86,6 +88,7 @@ export default Vue.extend({
         }
 
         this.showProgress = false;
+        this.disableInputs = false;
         document.getElementById('fileUpload').value = '';
       this.fileAddress = fileAddress;
     }
@@ -93,7 +96,6 @@ export default Vue.extend({
 });
 
 const readUploadedFileAsBase64 = (inputFile) => {
-  console.log(inputFile)
   const temporaryFileReader = new FileReader();
 
   return new Promise((resolve, reject) => {

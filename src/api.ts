@@ -157,15 +157,14 @@ export const uploadChunk = async (fileId: string, chunk: string, chunkNumber: nu
 export const downloadFile = async (fileId: string): Promise<string | undefined> => {
   let created_at = 0
   const messages = []
-  for (let i = 0; i < 10; i++) {
+  for(;;) {
     const group = await fileBody(fileId, 50, created_at);
 
     if (typeof group === 'undefined') return
     if (group.length === 0) break
     created_at = group[group.length - 1].created_at
     messages.push(...group)
-  }
-  //console.log(messages)
+  } 
   for (let i = 0; i < messages.length; i++) {
     const decoded = (await decodeBody(messages[i].body, [
       { "name": "chunk", "type": "string" },
