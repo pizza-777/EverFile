@@ -4,6 +4,8 @@ import {
   ReadonlyAbiParam
 } from 'everscale-inpage-provider';
 
+import { firstTransactionBody } from '@/graphQl';
+
 import { EverscaleStandaloneClient } from 'everscale-standalone-client';
 
 import { FileContract } from '@/contracts/FileContract';
@@ -47,7 +49,7 @@ async function everWallet(): Promise<everWallet | never> {
   return _accountInteraction;
 }
 
-export async function uploadFile(fileInfo: File): Promise<string | undefined> {  
+export async function uploadFile(fileInfo: File): Promise<string | undefined> {
   const everProvider = await ever();
   const accountInteraction = await everWallet();
   const fileAddress: string = genRandomAddress()
@@ -82,16 +84,11 @@ function genRandomAddress(): string {
 }
 
 export async function getFileInfo(fileId: string): Promise<FileInfo | undefined> {
-
-  try {
-    const transactions = (await _everStandalone.getTransactions({
-      address: new Address(fileId),
-    })).transactions
-
-    if (transactions.length == 0) return undefined;
-    //first transaction is about file 
+  try {  
+    const body = await firstTransactionBody(fileId);
+    if (typeof body === 'undefined') return    
     const data = await decodeBody(
-      transactions[transactions.length - 1].inMessage.body?.toString() ?? '',
+      body,
       [
         { "name": "name", "type": "string" },
         { "name": "size", "type": "string" },
