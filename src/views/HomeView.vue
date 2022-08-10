@@ -86,7 +86,7 @@ export default Vue.extend({
         }
 
         this.showProgress = false;
-       
+        document.getElementById('fileUpload').value = '';
       this.fileAddress = fileAddress;
     }
   }
