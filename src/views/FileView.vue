@@ -13,7 +13,7 @@
           <hr>         
           <b-card-text><b>type</b>: {{file.type}}</b-card-text> 
           <hr>
-          <b-button variant="outline-secondary">Download</b-button>        
+          <b-button variant="outline-secondary" @click="_download()">Download</b-button>        
     </b-card>        
     </div>
     </div>
@@ -21,6 +21,8 @@
 <script>
 import Vue from 'vue';
 import {getFileInfo} from '@/api';
+import {downloadFile} from '@/api';
+import download from 'downloadjs';
 
 export default Vue.extend({
   name: 'FileView',
@@ -29,6 +31,13 @@ export default Vue.extend({
       error: '',
       file: false
     };
+  },
+  methods:{
+    async _download(){
+      if(!this.file) return;
+      const base64 = await downloadFile(this.$route.params.fileId);      
+      download(base64, this.file.name, this.file.type);
+    }
   },
     mounted(){
         getFileInfo(this.$route.params.fileId).then(file => {                    

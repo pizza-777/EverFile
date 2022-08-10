@@ -4,7 +4,7 @@ import {
   ReadonlyAbiParam
 } from 'everscale-inpage-provider';
 
-import { firstTransactionBody } from '@/graphQl';
+import { firstTransactionBody, fileBody } from '@/graphQl';
 
 import { EverscaleStandaloneClient } from 'everscale-standalone-client';
 
@@ -84,9 +84,9 @@ function genRandomAddress(): string {
 }
 
 export async function getFileInfo(fileId: string): Promise<FileInfo | undefined> {
-  try {  
+  try {
     const body = await firstTransactionBody(fileId);
-    if (typeof body === 'undefined') return    
+    if (typeof body === 'undefined') return
     const data = await decodeBody(
       body,
       [
@@ -104,7 +104,8 @@ export async function getFileInfo(fileId: string): Promise<FileInfo | undefined>
   }
 }
 
-async function decodeBody(body: string, structure: readonly ReadonlyAbiParam[]): Promise<FileInfo | undefined> {
+//todo add correct
+async function decodeBody(body: string, structure: readonly ReadonlyAbiParam[]) {
   const everProvider = _everStandalone;
   try {
     const message = await everProvider.unpackFromCell({
@@ -148,4 +149,36 @@ export const uploadChunk = async (fileId: string, chunk: string, chunkNumber: nu
   } catch (e: unknown) {
     console.error(e);
   }
+}
+
+
+//todo add 'end' tag to the last chunk
+//todo add base64 type
+export const downloadFile = async (fileId: string): Promise<string | undefined> => {
+  let created_at = 0
+  const messages = []
+  for (let i = 0; i < 10; i++) {
+    const group = await fileBody(fileId, 50, created_at);
+
+    if (typeof group === 'undefined') return
+    if (group.length === 0) break
+    created_at = group[group.length - 1].created_at
+    messages.push(...group)
+  }
+  //console.log(messages)
+  for (let i = 0; i < messages.length; i++) {
+    const decoded = (await decodeBody(messages[i].body, [
+      { "name": "chunk", "type": "string" },
+      { "name": "chunkNumber", "type": "string" }
+    ])) as { chunk: string, chunkNumber: string } | undefined
+
+    if (typeof decoded === 'undefined') break
+
+    messages[i].body = decoded.chunk
+  }
+  let base64 = ''
+  for (let i = 0; i < messages.length; i++) {
+    base64 += messages[i].body
+  }
+  return base64
 }

@@ -15,25 +15,52 @@ const client = new TonClient({
   }
 });
 
-function query(fileAddr: string): string {
-  return `{
-        messages(
-          filter: {
-            dst: {
-              eq: "${fileAddr}"
-            }
-          }
-          orderBy: { path: "created_lt", direction: DESC }
-          limit: 1
-        ) {
-          body
-        }
-      }`
-}
-
 export const firstTransactionBody = async (fileAddr: string): Promise<string | undefined> => {
   try {
-    return (await client.net.query({ "query": query(fileAddr) })).result.data.messages[0].body;
+    return (await client.net.query({
+      "query": `{
+      messages(
+        filter: {
+          dst: {
+            eq: "${fileAddr}"
+          }
+        }
+        orderBy: { path: "created_lt", direction: DESC }
+        limit: 1
+      ) {
+        body
+      }
+    }` })).result.data.messages[0].body;
+  } catch (e) {
+    console.log(e);
+  }
+}
+
+
+
+export const fileBody = async (fileAddr: string, limit: number, created_at: number): Promise<{body: string, created_at: number}[] | undefined> => {
+  try {
+    return (await client.net.query({
+      "query": `{
+      messages(
+        filter: {
+          dst: {
+            eq: "${fileAddr}"
+          }
+        created_lt:{
+          eq: ${null}
+        }
+        created_at:{
+          gt:${created_at}
+        }
+        }
+        orderBy: { path: "created_lt", direction: DESC }
+        limit: ${limit}
+      ) {
+        body
+        created_at
+      }
+    }` })).result.data.messages;
   } catch (e) {
     console.log(e);
   }
