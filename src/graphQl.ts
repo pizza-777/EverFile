@@ -11,7 +11,7 @@ libWebSetup({
 TonClient.useBinaryLibrary(libWeb);
 const client = new TonClient({
   network: {
-    server_address: "127.0.0.1",
+    server_address: "main.ton.dev",
   }
 });
 

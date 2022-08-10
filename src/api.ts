@@ -16,7 +16,7 @@ let _accountInteraction: everWallet | undefined;
 const _everStandalone = new ProviderRpcClient({
   fallback: () =>
     EverscaleStandaloneClient.create({
-      connection: 'local',
+      connection: 'mainnet',
     }),
   forceUseFallback: true,
 });

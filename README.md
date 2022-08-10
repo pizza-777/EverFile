@@ -1,5 +1,7 @@
 # Ever File 
 
+Ever File is a simple file exchange service based on Everscale blockchain.
+
 ## Project setup
 
 ```
