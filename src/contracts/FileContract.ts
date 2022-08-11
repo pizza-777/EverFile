@@ -10,15 +10,15 @@ export const FileContract = {
                 "name": "upload",
                 "inputs": [
                     {
-                        "name": "name",
+                        "name": "file_name",
                         "type": "string"
                     },
                     {
-                        "name": "size",
+                        "name": "file_size",
                         "type": "string"
                     },
                     {
-                        "name": "type",
+                        "name": "file_type",
                         "type": "string"
                     }
                 ],

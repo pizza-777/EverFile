@@ -16,7 +16,7 @@ let _accountInteraction: everWallet | undefined;
 const _everStandalone = new ProviderRpcClient({
   fallback: () =>
     EverscaleStandaloneClient.create({
-      connection: 'mainnet',
+      connection: 'local',
     }),
   forceUseFallback: true,
 });
@@ -60,9 +60,9 @@ export async function uploadFile(fileInfo: File): Promise<string | undefined> {
   try {
     await fileContractObject.methods.upload(
       {
-        name: fileInfo.name,
-        size: String(fileInfo.size),
-        type: fileInfo.type == '' ? 'Unknown' : fileInfo.type,
+        file_name: fileInfo.name,
+        file_size: String(fileInfo.size),
+        file_type: fileInfo.type == '' ? 'Unknown' : fileInfo.type,
       }).send({
         from: accountInteraction.address,
         amount: '1',
@@ -90,9 +90,9 @@ export async function getFileInfo(fileId: string): Promise<FileInfo | undefined>
     const data = await decodeBody(
       body,
       [
-        { "name": "name", "type": "string" },
-        { "name": "size", "type": "string" },
-        { "name": "type", "type": "string" },
+        { "name": "file_name", "type": "string" },
+        { "name": "file_size", "type": "string" },
+        { "name": "file_type", "type": "string" },
       ]);
 
     if (typeof data == 'undefined') return;
