@@ -11,7 +11,7 @@ libWebSetup({
 TonClient.useBinaryLibrary(libWeb);
 const client = new TonClient({
   network: {
-    server_address: "main.ton.dev",
+    server_address: "127.0.0.1",
   }
 });
 
@@ -23,6 +23,9 @@ export const firstTransactionBody = async (fileAddr: string): Promise<string | u
         filter: {
           dst: {
             eq: "${fileAddr}"
+          }
+          created_lt:{
+            eq: null
           }
         }
         orderBy: { path: "created_lt", direction: DESC }
@@ -48,13 +51,13 @@ export const fileBody = async (fileAddr: string, limit: number, created_at: numb
             eq: "${fileAddr}"
           }
         created_lt:{
-          eq: ${null}
+          eq: null
         }
         created_at:{
           gt:${created_at}
         }
         }
-        orderBy: { path: "created_lt", direction: DESC }
+        orderBy: { path: "created_at", direction: ASC }
         limit: ${limit}
       ) {
         body

@@ -10,6 +10,8 @@ import { EverscaleStandaloneClient } from 'everscale-standalone-client';
 
 import { FileContract } from '@/contracts/FileContract';
 
+import { FileDeployerContract } from '@/contracts/FileDeployerContract';
+
 let _ever: ProviderRpcClient;
 let _accountInteraction: everWallet | undefined;
 
@@ -49,10 +51,47 @@ async function everWallet(): Promise<everWallet | never> {
   return _accountInteraction;
 }
 
-export async function uploadFile(fileInfo: File): Promise<string | undefined> {
+export async function deployFileContract(file_size: number): Promise<string | undefined> {
   const everProvider = await ever();
   const accountInteraction = await everWallet();
-  const fileAddress: string = genRandomAddress()
+
+  //min 1 ever, change will be returned later
+  const amount = (file_size < 1e5) ? 1e9 : file_size / 1024 * 0.1 * 1e9
+
+  const fileDeployerContractObject = new everProvider.Contract(
+    FileDeployerContract.abi,
+    new Address('0:a2e59af4d85d30ba9ca2d57e567daf0f09c4aefa75167d4fe629433652a66b5f')
+  );
+  try {
+    const salt = Math.floor(Math.random() * 1e12);
+    //deploy file contract
+    await fileDeployerContractObject.methods.fileDeploy(
+      {
+        salt: salt,
+      }).send({
+        from: accountInteraction.address,
+        amount: String(amount),
+        bounce: true
+      })
+    //calculate address
+    const fileAddress = await fileDeployerContractObject.methods.fileDeploy(
+      {
+        salt: salt,
+      }).call()
+
+    return fileAddress.value0.toString();
+  } catch (e: unknown) {
+    console.error(e);
+  }
+}
+
+
+export async function uploadFile(fileInfo: File): Promise<string | undefined> {
+  const everProvider = await ever();
+  const fileAddress = await deployFileContract(fileInfo.size);
+
+  if (typeof fileAddress === 'undefined') return
+
   const fileContractObject = new everProvider.Contract(
     FileContract.abi,
     new Address(fileAddress)
@@ -63,24 +102,14 @@ export async function uploadFile(fileInfo: File): Promise<string | undefined> {
         file_name: fileInfo.name,
         file_size: String(fileInfo.size),
         file_type: fileInfo.type == '' ? 'Unknown' : fileInfo.type,
-      }).send({
-        from: accountInteraction.address,
-        amount: '1',
-        bounce: true
+      }).sendExternal({
+        publicKey: '0x0',
+        withoutSignature: true,
       })
     return fileAddress;
   } catch (e: unknown) {
     console.error(e);
   }
-}
-
-function genRandomAddress(): string {
-  let address = '0:';
-  const chars = '0123456789abcdef';
-  for (let i = 0; i < 64; i++) {
-    address += chars[Math.floor(Math.random() * chars.length)];
-  }
-  return address;
 }
 
 export async function getFileInfo(fileId: string): Promise<FileInfo | undefined> {
@@ -171,6 +200,10 @@ export const downloadFile = async (fileId: string): Promise<string | undefined> 
     created_at = group[group.length - 1].created_at
     messages.push(...group)
   }
+
+  //delete first becouse it is not a chunk but a file info
+  messages.shift()
+
   for (let i = 0; i < messages.length; i++) {
     const decoded = (await decodeBody(messages[i].body, [
       { "name": "chunk", "type": "string" },
