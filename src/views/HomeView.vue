@@ -41,7 +41,7 @@
 </template>
 <script lang="ts">
 import Vue from 'vue';
-import { uploadFile, uploadChunk, createChunks } from '@/api.ts';
+import { returnChange, uploadFile, uploadChunk, createChunks } from '@/api.ts';
 
 export default Vue.extend({
   name: 'HomeView',
@@ -86,8 +86,12 @@ export default Vue.extend({
           await uploadChunk(fileAddress, chunks[i], i);         
           this.value = i;
         }
-        //final chunk -- neede for recognizing the end of file chunks
+        //final chunk -- need for recognizing the end of file chunks
         await uploadChunk(fileAddress, '', 0);
+
+        //return change and destroy file contract (don't need it anymore)
+        returnChange(fileAddress);
+
         this.showProgress = false;
         this.disableInputs = false;
         document.getElementById('fileUpload').value = '';

@@ -39,12 +39,38 @@ export const FileContract = {
                 "outputs": []
             },
             {
+                "name": "returnChange",
+                "inputs": [],
+                "outputs": []
+            },
+            {
                 "name": "constructor",
                 "inputs": [],
                 "outputs": []
+            },
+            {
+                "name": "sender",
+                "inputs": [],
+                "outputs": [
+                    {
+                        "name": "sender",
+                        "type": "address"
+                    }
+                ]
             }
         ],
-        "data": [],
+        "data": [
+            {
+                "key": 1,
+                "name": "salt",
+                "type": "uint256"
+            },
+            {
+                "key": 2,
+                "name": "sender",
+                "type": "address"
+            }
+        ],
         "events": [],
         "fields": [
             {
@@ -58,6 +84,14 @@ export const FileContract = {
             {
                 "name": "_constructorFlag",
                 "type": "bool"
+            },
+            {
+                "name": "salt",
+                "type": "uint256"
+            },
+            {
+                "name": "sender",
+                "type": "address"
             }
         ]
     } as const

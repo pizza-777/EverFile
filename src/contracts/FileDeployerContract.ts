@@ -12,6 +12,10 @@ export const FileDeployerContract = {
                     {
                         "name": "salt",
                         "type": "uint256"
+                    },
+                    {
+                        "name": "sender",
+                        "type": "address"
                     }
                 ],
                 "outputs": [

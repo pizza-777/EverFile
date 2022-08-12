@@ -1,7 +1,8 @@
 pragma ever-solidity >=0.51.2;
 
 contract File {
-	uint static salt; // random number for unique file id
+	uint256 static salt; // random number for unique file id
+	address public static sender; // return change after all to this guy
 
 	function upload(
 		string file_name,
@@ -18,5 +19,10 @@ contract File {
 		tvm.accept();
 		chunk;
 		chunkNumber;
+	}
+
+	function returnChange() public {
+		tvm.accept();
+		selfdestruct(sender);		
 	}
 }

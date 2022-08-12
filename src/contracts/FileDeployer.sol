@@ -4,12 +4,12 @@ import "./File.sol";
 contract FileDeployer {
 	TvmCell static fileCode;
 
-	function fileDeploy(uint salt) public view returns (address) {
+	function fileDeploy(uint256 salt, address sender) public view returns (address) {
 		tvm.rawReserve(address(this).balance - msg.value, 2);
-		
+
 		TvmCell stateInit = tvm.buildStateInit({
 			code: fileCode,
-			varInit: {salt: salt},
+			varInit: {salt: salt, sender: sender},
 			contr: File,
 			pubkey: 0
 		});
@@ -17,7 +17,7 @@ contract FileDeployer {
 		address fileAddress = new File{
 			stateInit: stateInit,
 			value: 0,
-			wid: msg.sender.wid,
+			wid: sender.wid,
 			flag: 128
 		}();
 

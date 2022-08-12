@@ -18,7 +18,7 @@ let _accountInteraction: everWallet | undefined;
 const _everStandalone = new ProviderRpcClient({
   fallback: () =>
     EverscaleStandaloneClient.create({
-      connection: 'local',
+      connection: 'mainnet',
     }),
   forceUseFallback: true,
 });
@@ -55,19 +55,20 @@ export async function deployFileContract(file_size: number): Promise<string | un
   const everProvider = await ever();
   const accountInteraction = await everWallet();
 
-  //min 1 ever, change will be returned later
-  const amount = (file_size < 1e5) ? 1e9 : file_size / 1024 * 0.1 * 1e9
+  //change will be returned later
+  const amount = Math.ceil((file_size / 1024 * 0.02 * 1e9 + 5e8) / 1e9) * 1e9;
 
   const fileDeployerContractObject = new everProvider.Contract(
     FileDeployerContract.abi,
-    new Address('0:a2e59af4d85d30ba9ca2d57e567daf0f09c4aefa75167d4fe629433652a66b5f')
+    new Address('0:0ee3ba56a7dd651e42da6d5bcbe715d2b84933d3309744563dfd2d9e71162586')
   );
   try {
     const salt = Math.floor(Math.random() * 1e12);
     //deploy file contract
-    await fileDeployerContractObject.methods.fileDeploy(
+   await fileDeployerContractObject.methods.fileDeploy(
       {
         salt: salt,
+        sender: accountInteraction.address,
       }).send({
         from: accountInteraction.address,
         amount: String(amount),
@@ -77,6 +78,7 @@ export async function deployFileContract(file_size: number): Promise<string | un
     const fileAddress = await fileDeployerContractObject.methods.fileDeploy(
       {
         salt: salt,
+        sender: accountInteraction.address,
       }).call()
 
     return fileAddress.value0.toString();
@@ -114,7 +116,7 @@ export async function uploadFile(fileInfo: File): Promise<string | undefined> {
 
 export async function getFileInfo(fileId: string): Promise<FileInfo | undefined> {
   try {
-    const body = await firstTransactionBody(fileId);
+    const body = await firstTransactionBody(fileId);    
     if (typeof body === 'undefined') return
     const data = await decodeBody(
       body,
@@ -180,27 +182,35 @@ export const uploadChunk = async (fileId: string, chunk: string, chunkNumber: nu
   }
 }
 
+export const returnChange = async (fileId: string) => {
+  const everProvider = await ever();
+  const fileContractObject = new everProvider.Contract(
+    FileContract.abi,
+    new Address(fileId)
+  );
+  try {
+   const t = await fileContractObject.methods.returnChange(
+      {}).sendExternal({
+        publicKey: '0x0',
+        withoutSignature: true,
+      })
+      console.log('return change', t)
+  } catch (e: unknown) {
+    console.error(e);
+  }
+}
 
-//todo add 'end' tag to the last chunk
-//todo add base64 type
+//todo add base64 type for fun
 export const downloadFile = async (fileId: string): Promise<string | undefined> => {
   let created_at = 0
   const messages = []
   for (; ;) {
     const group = await fileBody(fileId, 50, created_at);
-
     if (typeof group === 'undefined') return
-    if (group.length === 0) break
-    //stop if stop message found
-    if (group[group.length - 1].body == 'te6ccgEBAwEAFgACGQAAAMFD3RyBEFuulcACAQACMAAA') {
-      group.pop()
-      messages.push(...group)
-      break
-    }
+    if (group.length === 0) break    
     created_at = group[group.length - 1].created_at
     messages.push(...group)
   }
-
   //delete first becouse it is not a chunk but a file info
   messages.shift()
 
@@ -210,10 +220,13 @@ export const downloadFile = async (fileId: string): Promise<string | undefined> 
       { "name": "chunkNumber", "type": "string" }
     ])) as { chunk: string, chunkNumber: string } | undefined
 
-    if (typeof decoded === 'undefined') break
-
+    if (typeof decoded === 'undefined' || decoded.chunk==='') {
+       messages.splice(i); //stop '' mesage was found
+       break
+    }
+ 
     messages[i].body = decoded.chunk
-  }
+  }  
   let base64 = ''
   for (let i = 0; i < messages.length; i++) {
     base64 += messages[i].body
