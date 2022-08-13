@@ -6,7 +6,7 @@ import {
 
 import { firstTransactionBody, fileBody } from '@/graphQl';
 
-import { EverscaleStandaloneClient } from 'everscale-standalone-client';
+import { ConnectionProperties, EverscaleStandaloneClient } from 'everscale-standalone-client';
 
 import { FileContract } from '@/contracts/FileContract';
 
@@ -25,7 +25,7 @@ let oldSecret = '';
 const _everStandalone = new ProviderRpcClient({
   fallback: () =>
     EverscaleStandaloneClient.create({
-      connection: 'local',
+      connection: config.network.broxus as ConnectionProperties,
     }),
   forceUseFallback: true,
 });
@@ -107,8 +107,7 @@ export async function uploadFile(fileInfo: File): Promise<string | undefined> {
   );
   try {
     const newSecret = String(Math.floor(Math.random() * 1e12));
-    newHash = await createHash(newSecret);
-    console.log(newHash)
+    newHash = await createHash(newSecret);  
     await fileContractObject.methods.upload(
       {
         file_name: fileInfo.name,
@@ -207,11 +206,17 @@ export const returnChange = async (fileId: string) => {
     new Address(fileId)
   );
   try {
+    const newSecret = String(Math.floor(Math.random() * 1e12));
+    newHash = await createHash(newSecret); 
     await fileContractObject.methods.returnChange(
-      {}).sendExternal({
+      {
+        newHash: newHash,
+        oldSecret: oldSecret
+      }).sendExternal({
         publicKey: '0x0',
         withoutSignature: true,
       })
+      oldSecret = ''
   } catch (e: unknown) {
     console.error(e);
   }

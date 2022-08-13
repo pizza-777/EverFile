@@ -38,7 +38,7 @@ contract File {
     chunkNumber;
   }
 
-  function returnChange() public {
+  function returnChange(string newHash, string oldSecret) public checkSender(newHash, oldSecret) {
     tvm.accept();
     selfdestruct(sender);
   }
