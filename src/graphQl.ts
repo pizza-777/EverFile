@@ -1,6 +1,6 @@
 import { TonClient } from "@tonclient/core";
 import { libWeb, libWebSetup } from "@tonclient/lib-web";
-
+import { config } from './config';
 
 libWebSetup({
   binaryURL: "./tonclient.wasm",
@@ -11,7 +11,7 @@ libWebSetup({
 TonClient.useBinaryLibrary(libWeb);
 const client = new TonClient({
   network: {
-    server_address: 'main.ton.dev',
+    server_address: config.network.everx,
   }
 });
 

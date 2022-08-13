@@ -12,13 +12,20 @@ import { FileContract } from '@/contracts/FileContract';
 
 import { FileDeployerContract } from '@/contracts/FileDeployerContract';
 
+import { UtilsContract } from '@/contracts/UtilsContract';
+
+import { config } from '@/config';
+
 let _ever: ProviderRpcClient;
 let _accountInteraction: everWallet | undefined;
+
+let newHash: string;
+let oldSecret = '';
 
 const _everStandalone = new ProviderRpcClient({
   fallback: () =>
     EverscaleStandaloneClient.create({
-      connection: 'mainnet',
+      connection: 'local',
     }),
   forceUseFallback: true,
 });
@@ -60,12 +67,12 @@ export async function deployFileContract(file_size: number): Promise<string | un
 
   const fileDeployerContractObject = new everProvider.Contract(
     FileDeployerContract.abi,
-    new Address('0:0ee3ba56a7dd651e42da6d5bcbe715d2b84933d3309744563dfd2d9e71162586')
+    new Address(config.fileDeployer)
   );
   try {
     const salt = Math.floor(Math.random() * 1e12);
     //deploy file contract
-   await fileDeployerContractObject.methods.fileDeploy(
+    await fileDeployerContractObject.methods.fileDeploy(
       {
         salt: salt,
         sender: accountInteraction.address,
@@ -99,15 +106,21 @@ export async function uploadFile(fileInfo: File): Promise<string | undefined> {
     new Address(fileAddress)
   );
   try {
+    const newSecret = String(Math.floor(Math.random() * 1e12));
+    newHash = await createHash(newSecret);
+    console.log(newHash)
     await fileContractObject.methods.upload(
       {
         file_name: fileInfo.name,
         file_size: String(fileInfo.size),
         file_type: fileInfo.type == '' ? 'Unknown' : fileInfo.type,
+        newHash: newHash,
+        oldSecret: oldSecret
       }).sendExternal({
         publicKey: '0x0',
         withoutSignature: true,
       })
+    oldSecret = newSecret;
     return fileAddress;
   } catch (e: unknown) {
     console.error(e);
@@ -116,7 +129,7 @@ export async function uploadFile(fileInfo: File): Promise<string | undefined> {
 
 export async function getFileInfo(fileId: string): Promise<FileInfo | undefined> {
   try {
-    const body = await firstTransactionBody(fileId);    
+    const body = await firstTransactionBody(fileId);
     if (typeof body === 'undefined') return
     const data = await decodeBody(
       body,
@@ -169,14 +182,19 @@ export const uploadChunk = async (fileId: string, chunk: string, chunkNumber: nu
     new Address(fileId)
   );
   try {
+    const newSecret = String(Math.floor(Math.random() * 1e9));
+    newHash = await createHash(newSecret);
     await fileContractObject.methods.uploadChunk(
       {
         chunk: chunk,
         chunkNumber: String(chunkNumber),
+        newHash: newHash,
+        oldSecret: oldSecret
       }).sendExternal({
         publicKey: '0x0',
         withoutSignature: true,
       })
+    oldSecret = newSecret;
   } catch (e: unknown) {
     console.error(e);
   }
@@ -189,12 +207,11 @@ export const returnChange = async (fileId: string) => {
     new Address(fileId)
   );
   try {
-   const t = await fileContractObject.methods.returnChange(
+    const t = await fileContractObject.methods.returnChange(
       {}).sendExternal({
         publicKey: '0x0',
         withoutSignature: true,
       })
-      console.log('return change', t)
   } catch (e: unknown) {
     console.error(e);
   }
@@ -207,7 +224,7 @@ export const downloadFile = async (fileId: string): Promise<string | undefined> 
   for (; ;) {
     const group = await fileBody(fileId, 50, created_at);
     if (typeof group === 'undefined') return
-    if (group.length === 0) break    
+    if (group.length === 0) break
     created_at = group[group.length - 1].created_at
     messages.push(...group)
   }
@@ -220,16 +237,30 @@ export const downloadFile = async (fileId: string): Promise<string | undefined> 
       { "name": "chunkNumber", "type": "string" }
     ])) as { chunk: string, chunkNumber: string } | undefined
 
-    if (typeof decoded === 'undefined' || decoded.chunk==='') {
-       messages.splice(i); //stop '' mesage was found
-       break
+    if (typeof decoded === 'undefined' || decoded.chunk === '') {
+      messages.splice(i); //stop '' mesage was found
+      break
     }
- 
+
     messages[i].body = decoded.chunk
-  }  
+  }
   let base64 = ''
   for (let i = 0; i < messages.length; i++) {
     base64 += messages[i].body
   }
   return base64
+}
+
+export async function createHash(s: string) {
+
+  const everProvider = await ever();
+  const Utils = new everProvider.Contract(
+    UtilsContract.abi,
+    new Address(config.utils)
+  );
+  const hash = await Utils.methods.hash(
+    {
+      s: s,
+    }).call()
+  return hash.value0
 }
