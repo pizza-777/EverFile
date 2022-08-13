@@ -1,12 +1,12 @@
 <template>
   <div>
-    <nav class="text-center mt-5">
-      <router-link class="text-secondary" to="/">Home</router-link>
+    <nav class="text-center mt-3">
+      <router-link class="text-secondary" to="/">Upload</router-link>
     </nav>
     <div class="container mt-5">
       <div v-show="show" class="text-secondary">
         file address:
-        <b-link :href="'https://everscan.io/accounts/' + this.$route.params.fileId+'?msg-types=internal%2Cexternal-in%2Cexternal-out'" class="link-secondary"  target="_blank"
+        <b-link :href="'https://everscan.io/accounts/' + this.$route.params.fileId + '?msg-types=internal%2Cexternal-in%2Cexternal-out'" class="link-secondary" target="_blank"
           ><b>{{ this.$route.params.fileId }}</b></b-link
         >
       </div>
@@ -19,6 +19,12 @@
         <b-card-text><b>type</b>: {{ file.file_type }}</b-card-text>
         <hr />
         <b-button variant="outline-secondary" @click="_download()">Download</b-button>
+        <b-link class="text-secondary ms-3" v-if="isImage" :href="'/#/image/'+this.$route.params.fileId" target="_blank">
+          <span class="me-2">Open</span>
+          <span>
+            <b-icon-box-arrow-up-right></b-icon-box-arrow-up-right>
+          </span>
+        </b-link>
       </b-card>
     </div>
   </div>
@@ -28,6 +34,8 @@ import Vue from 'vue'
 import { getFileInfo } from '@/api'
 import { downloadFile } from '@/api'
 import download from 'downloadjs'
+
+
 
 //convert bytes to human readable format
 function bytesToSize(bytes) {
@@ -44,6 +52,7 @@ export default Vue.extend({
       file: false,
       humanFileSize: false,
       show: false,
+      isImage: false,
     }
   },
   methods: {
@@ -51,6 +60,15 @@ export default Vue.extend({
       if (!this.file) return
       const base64 = await downloadFile(this.$route.params.fileId)
       download(base64, this.file.file_name, this.file.file_type)
+    },
+    async showImage() {
+      const data = await downloadFile(this.$route.params.fileId)
+      var image = new Image()
+      image.src = data
+
+      var w = window.open('')
+      w.document.write(image.outerHTML)
+      w.document.close()
     },
   },
   mounted() {
@@ -62,6 +80,7 @@ export default Vue.extend({
         this.file = file
         this.humanFileSize = bytesToSize(file.file_size)
         this.show = true
+        this.isImage = file.file_type.includes('image')
       }
     })
   },

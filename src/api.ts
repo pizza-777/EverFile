@@ -207,7 +207,7 @@ export const returnChange = async (fileId: string) => {
     new Address(fileId)
   );
   try {
-    const t = await fileContractObject.methods.returnChange(
+    await fileContractObject.methods.returnChange(
       {}).sendExternal({
         publicKey: '0x0',
         withoutSignature: true,
