@@ -1,4 +1,4 @@
-pragma ever-solidity >=0.51.2;
+pragma ever-solidity >=0.61.2;
 import "./File.sol";
 
 contract FileDeployer {

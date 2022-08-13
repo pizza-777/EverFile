@@ -1,4 +1,5 @@
-pragma ever-solidity >=0.51.2;
+pragma ever-solidity >=0.61.2;
+pragma copyleft 0, 0x70da6d4b6b3ab29f418aabffa3a630de48de9e9f2659030329dee11ea656b77f;
 
 contract File {
 	uint256 static salt; // random number for unique file id

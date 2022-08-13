@@ -19,10 +19,10 @@
                 <div class="col-md-12">
                   <b-button variant="outline-secondary" @click="_uploadFile()" :disabled="disableInputs">
                     Upload
-                    <b-spinner style="margin-left: 0.3em" v-if="btnLoader" small></b-spinner>                   
+                    <b-spinner style="margin-left: 0.3em" v-if="btnLoader" small></b-spinner>
                   </b-button>
-                   <span style="margin-left: 0.4em" v-if="btnLoader" class="text-secondary">prepearing ... </span>
-                   <span style="margin-left: 0.4em" v-if="showProgress" class="text-secondary">uploading ... </span>
+                  <span style="margin-left: 0.4em" v-if="btnLoader" class="text-secondary">prepearing ... </span>
+                  <span style="margin-left: 0.4em" v-if="showProgress" class="text-secondary">uploading ... </span>
                 </div>
               </div>
               <div class="row mt-4" v-if="showProgress">
@@ -71,10 +71,12 @@ export default Vue.extend({
         return
       }
       this.btnLoader = true
+      this.disableInputs = true
       const fileAddress = await uploadFile(this.file)
 
       if (typeof fileAddress === 'undefined') {
         this.btnLoader = false
+        this.disableInputs = false
         return
       }
 
@@ -88,7 +90,6 @@ export default Vue.extend({
       const chunks = createChunks(base64, 15000)
       this.btnLoader = false
       this.showProgress = true
-      this.disableInputs = true
 
       this.max = chunks.length - 1 //progress bar
 
