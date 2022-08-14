@@ -19,7 +19,7 @@
         <b-card-text><b>type</b>: {{ file.file_type }}</b-card-text>
         <hr />
         <b-button variant="outline-secondary" @click="_download()">Download</b-button>
-        <b-link class="text-secondary ms-3" v-if="isImage" :href="'/#/image/'+this.$route.params.fileId" target="_blank">
+        <b-link class="text-secondary ms-3" v-if="isImage" :href="'./#/image/'+this.$route.params.fileId" target="_blank">
           <span class="me-2">Open</span>
           <span>
             <b-icon-box-arrow-up-right></b-icon-box-arrow-up-right>
