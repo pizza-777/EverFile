@@ -1,4 +1,4 @@
-pragma ever-solidity >=0.61.2;
+pragma ever-solidity >=0.60.0;
 
 contract File {
   uint256 static salt; // random number for unique file id
