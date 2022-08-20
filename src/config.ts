@@ -3,6 +3,6 @@ export const config = {
         broxus: 'local',
         everx: '127.0.0.1'
     },
-    fileDeployer: '0:74782d413ce72fc4702bdc67469898afa191b13c6cd2e0b3fc45d03097b5b43e',
+    fileDeployer: '0:5e314358e0a9f8bfb04efd8f3f28a78423567b06031a1f72cbf0bb40990052a2',
     utils:        '0:8b7ea04202cf25ce09327d3dfa214e42209e1b9e27335d26c224271092ae1ee2',
 }

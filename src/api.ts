@@ -19,9 +19,6 @@ import { config } from '@/config';
 let _ever: ProviderRpcClient;
 let _accountInteraction: everWallet | undefined;
 
-let newHash: string;
-let oldSecret = '';
-
 const _everStandalone = new ProviderRpcClient({
   fallback: () =>
     EverscaleStandaloneClient.create({
@@ -106,20 +103,15 @@ export async function uploadFile(fileInfo: File): Promise<string | undefined> {
     new Address(fileAddress)
   );
   try {
-    const newSecret = String(Math.floor(Math.random() * 1e12));
-    newHash = await createHash(newSecret);  
     await fileContractObject.methods.upload(
       {
         file_name: fileInfo.name,
         file_size: String(fileInfo.size),
-        file_type: fileInfo.type == '' ? 'Unknown' : fileInfo.type,
-        newHash: newHash,
-        oldSecret: oldSecret
+        file_type: fileInfo.type == '' ? 'Unknown' : fileInfo.type
       }).sendExternal({
         publicKey: '0x0',
         withoutSignature: true,
       })
-    oldSecret = newSecret;
     return fileAddress;
   } catch (e: unknown) {
     console.error(e);
@@ -181,19 +173,14 @@ export const uploadChunk = async (fileId: string, chunk: string, chunkNumber: nu
     new Address(fileId)
   );
   try {
-    const newSecret = String(Math.floor(Math.random() * 1e9));
-    newHash = await createHash(newSecret);
     await fileContractObject.methods.uploadChunk(
       {
         chunk: chunk,
         chunkNumber: String(chunkNumber),
-        newHash: newHash,
-        oldSecret: oldSecret
       }).sendExternal({
         publicKey: '0x0',
         withoutSignature: true,
       })
-    oldSecret = newSecret;
   } catch (e: unknown) {
     console.error(e);
   }
@@ -206,17 +193,11 @@ export const returnChange = async (fileId: string) => {
     new Address(fileId)
   );
   try {
-    const newSecret = String(Math.floor(Math.random() * 1e12));
-    newHash = await createHash(newSecret); 
     await fileContractObject.methods.returnChange(
-      {
-        newHash: newHash,
-        oldSecret: oldSecret
-      }).sendExternal({
+      {}).sendExternal({
         publicKey: '0x0',
         withoutSignature: true,
       })
-      oldSecret = ''
   } catch (e: unknown) {
     console.error(e);
   }

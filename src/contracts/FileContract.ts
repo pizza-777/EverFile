@@ -18,14 +18,6 @@ export const FileContract = {
                     {
                         "name": "file_type",
                         "type": "string"
-                    },
-                    {
-                        "name": "newHash",
-                        "type": "string"
-                    },
-                    {
-                        "name": "oldSecret",
-                        "type": "string"
                     }
                 ],
                 "outputs": []
@@ -40,30 +32,13 @@ export const FileContract = {
                     {
                         "name": "chunkNumber",
                         "type": "string"
-                    },
-                    {
-                        "name": "newHash",
-                        "type": "string"
-                    },
-                    {
-                        "name": "oldSecret",
-                        "type": "string"
                     }
                 ],
                 "outputs": []
             },
             {
                 "name": "returnChange",
-                "inputs": [
-                    {
-                        "name": "newHash",
-                        "type": "string"
-                    },
-                    {
-                        "name": "oldSecret",
-                        "type": "string"
-                    }
-                ],
+                "inputs": [],
                 "outputs": []
             },
             {
@@ -130,10 +105,6 @@ export const FileContract = {
             {
                 "name": "sender",
                 "type": "address"
-            },
-            {
-                "name": "oldHash",
-                "type": "string"
             }
         ]
     } as const,
