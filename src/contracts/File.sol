@@ -6,11 +6,11 @@ contract File {
 
   string oldHash = '0';
 
-  event meta (string file_name, string file_size, string file_type);
+  event meta(string file_name, string file_size, string file_type);
 
   modifier checkSender(string newHash, string oldSecret) {
     if (oldHash != '0') {
-      require(oldHash == format('{}', tvm.hash(oldSecret)), 102, 'oldSecret is not correct');
+      //require(oldHash == format('{}', tvm.hash(oldSecret)), 102, 'oldSecret is not correct');
     }
     oldHash = newHash;
     _;
@@ -41,5 +41,10 @@ contract File {
   function returnChange(string newHash, string oldSecret) public checkSender(newHash, oldSecret) {
     tvm.accept();
     selfdestruct(sender);
+  }
+
+  function afterSignatureCheck(TvmSlice body, TvmCell message) private inline returns (TvmSlice) {
+    message;
+    return body;
   }
 }
