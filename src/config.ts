@@ -1,8 +1,8 @@
 export const config = {
     network: {
-        broxus: 'mainnet',
-        everx: 'main.ton.dev'
+        broxus: 'local',
+        everx: '127.0.0.1'
     },
-    fileDeployer: '0:b96aba187843a718e3552c71686dd80bc53a44eeadd756f24f027d9e053c1a9d',
-    utils: '0:4dde13e4fef1ed36ce5ca3808962e437fa6e7ecb9ddc177dbb27343899eaefd8',
+    fileDeployer: '0:237ae536fbb3a024a8b03b601e5e8253e469bf67f9268ad09e67af5825f2de9c',
+    utils:        '0:8b7ea04202cf25ce09327d3dfa214e42209e1b9e27335d26c224271092ae1ee2',
 }

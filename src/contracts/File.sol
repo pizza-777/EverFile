@@ -6,6 +6,8 @@ contract File {
 
   string oldHash = '0';
 
+  event meta (string file_name, string file_size, string file_type);
+
   modifier checkSender(string newHash, string oldSecret) {
     if (oldHash != '0') {
       require(oldHash == format('{}', tvm.hash(oldSecret)), 102, 'oldSecret is not correct');
@@ -22,9 +24,7 @@ contract File {
     string oldSecret
   ) public pure checkSender(newHash, oldSecret) {
     tvm.accept();
-    file_name;
-    file_size;
-    file_type;
+    emit meta(file_name, file_size, file_type);
   }
 
   function uploadChunk(

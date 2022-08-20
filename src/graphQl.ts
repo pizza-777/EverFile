@@ -21,7 +21,7 @@ export const firstTransactionBody = async (fileAddr: string): Promise<string | u
       "query": `{
       messages(
         filter: {
-          dst: {
+          src: {
             eq: "${fileAddr}"
           }
         	bounce:{
