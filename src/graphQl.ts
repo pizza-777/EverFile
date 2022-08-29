@@ -39,31 +39,34 @@ export const firstTransactionBody = async (fileAddr: string): Promise<string | u
   }
 }
 
-
-
-export const fileBody = async (fileAddr: string, limit: number, created_at: number): Promise<{ body: string, created_at: number }[] | undefined> => {
+export const fileBody = async (fileAddr: string, after: string): Promise<BlockchainMessages | undefined> => {
   try {
-    return (await client.net.query({
-      "query": `{
-      messages(
-        filter: {
-          dst: {
-            eq: "${fileAddr}"
+    const r = (await client.net.query({
+      "query": `query {
+        blockchain {
+          account(
+            address: "${fileAddr}"
+          ) {
+            messages(
+              msg_type: ExtIn
+              ${after !== "" ? 'after: ' + after : ""}
+              ) {
+              pageInfo {
+                startCursor
+                endCursor
+                hasNextPage
+              }
+              edges {
+                node {
+                  body
+                }
+              }
+            }
           }
-          bounce:{
-            eq: null
-          }  
-        created_at:{
-          gt:${created_at}
         }
-        }
-        orderBy: { path: "created_at", direction: ASC }
-        limit: ${limit}
-      ) {
-        body
-        created_at
       }
-    }` })).result.data.messages;
+      ` })).result.data.blockchain.account.messages;
+    return r;
   } catch (e) {
     console.log(e);
   }

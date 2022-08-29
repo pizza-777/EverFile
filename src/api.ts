@@ -205,35 +205,30 @@ export const returnChange = async (fileId: string) => {
 
 //todo add base64 type for fun
 export const downloadFile = async (fileId: string): Promise<string | undefined> => {
-  let created_at = 0
+  let after = ""
   const messages = []
   for (; ;) {
-    const group = await fileBody(fileId, 50, created_at);
+    const group = await fileBody(fileId, after);
     if (typeof group === 'undefined') return
-    if (group.length === 0) break
-    created_at = group[group.length - 1].created_at
-    messages.push(...group)
+    after = group.pageInfo.endCursor
+    if (group.edges.length > 0) messages.push(...group.edges)
+    if (!group.pageInfo.hasNextPage) break
   }
-  //delete first becouse it is not a chunk but a file info
-  messages.shift()
-
+  const sortingArray: string[] = []
   for (let i = 0; i < messages.length; i++) {
-    const decoded = (await decodeBody(messages[i].body, [
+    const decoded = (await decodeBody(messages[i].node.body, [
       { "name": "chunk", "type": "string" },
       { "name": "chunkNumber", "type": "string" }
     ])) as { chunk: string, chunkNumber: string } | undefined
 
-    if (typeof decoded === 'undefined' || decoded.chunk === '') {
-      messages.splice(i); //stop '' mesage was found
-      break
+    if (typeof decoded === 'undefined' || decoded.chunk === '' || parseInt(decoded.chunkNumber) > messages.length + 3) {
+      continue;
     }
 
-    messages[i].body = decoded.chunk
+    sortingArray[parseInt(decoded.chunkNumber)] = decoded.chunk
   }
-  let base64 = ''
-  for (let i = 0; i < messages.length; i++) {
-    base64 += messages[i].body
-  }
+  const base64 = sortingArray.join("");
+
   return base64
 }
 
