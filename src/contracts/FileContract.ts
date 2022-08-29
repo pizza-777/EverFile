@@ -2,7 +2,10 @@ export const FileContract = {
     abi: {
         "ABI version": 2,
         "version": "2.2",
-        "header": [],
+        "header": [
+            "time",
+            "expire"
+        ],
         "functions": [
             {
                 "name": "upload",

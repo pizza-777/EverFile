@@ -1,4 +1,6 @@
 pragma ever-solidity >=0.60.0;
+pragma AbiHeader time;
+pragma AbiHeader expire;
 
 contract File {
   uint256 static salt; // random number for unique file id
@@ -31,6 +33,7 @@ contract File {
 
   function afterSignatureCheck(TvmSlice body, TvmCell message) private inline returns (TvmSlice) {
     message;
+    (uint64 time, uint32 expireAt) = body.decode(uint64, uint32);
     return body;
   }
 }
