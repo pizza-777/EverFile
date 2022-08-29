@@ -6,24 +6,28 @@ contract File {
   uint256 static salt; // random number for unique file id
   address public static sender; // return change after all to this guy
 
+  //replay protection
+  mapping(uint8 => bool) public chunks; // for chunks
+  bool isMeta = false;
+
   event meta(string file_name, string file_size, string file_type);
 
   function upload(
     string file_name,
     string file_size,
-    string file_type    
-  ) public pure {
+    string file_type
+  ) public {
+    require(isMeta == false, 102, "File meta data was set");
     tvm.accept();
     emit meta(file_name, file_size, file_type);
+    isMeta = true;
   }
 
-  function uploadChunk(
-    string chunk,
-    string chunkNumber    
-  ) public pure {
-    tvm.accept();
+  function uploadChunk(string chunk, string chunkNumber) public {
     chunk;
-    chunkNumber;
+    uint8 chunkNumberNumeric = uint8(stoi(chunkNumber).get());
+    require(chunks.add(chunkNumberNumeric, true), 101, 'Chunk already exists');
+    tvm.accept();
   }
 
   function returnChange() public {

@@ -58,6 +58,16 @@ export const FileContract = {
                         "type": "address"
                     }
                 ]
+            },
+            {
+                "name": "chunks",
+                "inputs": [],
+                "outputs": [
+                    {
+                        "name": "chunks",
+                        "type": "map(uint8,bool)"
+                    }
+                ]
             }
         ],
         "data": [
@@ -108,6 +118,14 @@ export const FileContract = {
             {
                 "name": "sender",
                 "type": "address"
+            },
+            {
+                "name": "chunks",
+                "type": "map(uint8,bool)"
+            },
+            {
+                "name": "isMeta",
+                "type": "bool"
             }
         ]
     } as const,

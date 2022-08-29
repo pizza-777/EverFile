@@ -93,12 +93,13 @@ export default Vue.extend({
 
       this.max = chunks.length - 1 //progress bar
 
+      const promises = []
       for (let i = 0; i < chunks.length; i++) {
-        await uploadChunk(fileAddress, chunks[i], i)
+        promises.push(uploadChunk(fileAddress, chunks[i], i))
         this.value = i
       }
-      //final chunk -- need for recognizing the end of file chunks
-      await uploadChunk(fileAddress, '', 0)
+
+      await Promise.all(promises);
 
       //return change and destroy file contract (don't need it anymore)
       returnChange(fileAddress)
