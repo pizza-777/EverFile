@@ -49,7 +49,7 @@ export const fileBody = async (fileAddr: string, after: string): Promise<Blockch
           ) {
             messages(
               msg_type: ExtIn
-              ${after !== "" ? 'after: ' + after : ""}
+              ${after !== "" ? 'after: "' + after + '"' : ""}
               ) {
               pageInfo {
                 startCursor
