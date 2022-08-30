@@ -65,7 +65,17 @@ export const FileContract = {
                 "outputs": [
                     {
                         "name": "chunks",
-                        "type": "map(uint8,bool)"
+                        "type": "map(uint32,bool)"
+                    }
+                ]
+            },
+            {
+                "name": "chunksCounter",
+                "inputs": [],
+                "outputs": [
+                    {
+                        "name": "chunksCounter",
+                        "type": "uint32"
                     }
                 ]
             }
@@ -121,7 +131,11 @@ export const FileContract = {
             },
             {
                 "name": "chunks",
-                "type": "map(uint8,bool)"
+                "type": "map(uint32,bool)"
+            },
+            {
+                "name": "chunksCounter",
+                "type": "uint32"
             },
             {
                 "name": "isMeta",

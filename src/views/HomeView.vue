@@ -93,16 +93,20 @@ export default Vue.extend({
 
       this.max = chunks.length - 1 //progress bar
 
-      const promises = []
+      let promises = []
       for (let i = 0; i < chunks.length; i++) {
         promises.push(uploadChunk(fileAddress, chunks[i], i))
+        if ((i + 1) % 10 == 0) {
+          await Promise.all(promises)
+          promises = []
+        }
         this.value = i
       }
 
-      await Promise.all(promises);
+      await Promise.all(promises)
 
       //return change and destroy file contract (don't need it anymore)
-      returnChange(fileAddress)
+      //  returnChange(fileAddress)
 
       this.showProgress = false
       this.disableInputs = false
