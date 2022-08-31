@@ -6,7 +6,7 @@
     <div class="container mt-5">
       <div v-show="show" class="text-secondary">
         file address:
-        <b-link :href="'https://everscan.io/accounts/' + this.$route.params.fileId + '?msg-types=internal%2Cexternal-in%2Cexternal-out'" class="link-secondary" target="_blank"
+        <b-link :href="'https://' + explorer + '/accounts/accountDetails?id=' + this.$route.params.fileId" class="link-secondary" target="_blank"
           ><b>{{ this.$route.params.fileId }}</b></b-link
         >
       </div>
@@ -18,9 +18,9 @@
         <hr />
         <b-card-text><b>type</b>: {{ file.file_type }}</b-card-text>
         <hr />
-        <b-button variant="outline-secondary" @click="_download()" :disabled="btnLoader">         
+        <b-button variant="outline-secondary" @click="_download()" :disabled="btnLoader">
           Download
-           <b-spinner style="margin-left: 0.3em" v-if="btnLoader" small></b-spinner>
+          <b-spinner style="margin-left: 0.3em" v-if="btnLoader" small></b-spinner>
         </b-button>
         <b-link class="text-secondary ms-3" v-if="isImage" :href="'./#/image/' + this.$route.params.fileId" target="_blank">
           <span class="me-2">Open</span>
@@ -37,6 +37,7 @@ import Vue from 'vue'
 import { getFileInfo } from '@/api'
 import { downloadFile } from '@/api'
 import download from 'downloadjs'
+import { config } from '@/config'
 
 //convert bytes to human readable format
 function bytesToSize(bytes) {
@@ -55,6 +56,7 @@ export default Vue.extend({
       show: false,
       isImage: false,
       btnLoader: false,
+      explorer: config.network.broxus == 'testnet' ? 'net.ever.live' : 'ever.live',
     }
   },
   methods: {
