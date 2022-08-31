@@ -71,3 +71,39 @@ export const fileBody = async (fileAddr: string, after: string): Promise<Blockch
     console.log(e);
   }
 }
+
+
+export const uploadedFiles = async (after: string): Promise<BlockchainMessages | undefined> => {
+  try {
+    const r = (await client.net.query({
+      "query": `{
+        blockchain {
+          account(
+            address: "${config.fileDeployer}"
+          ) {
+            messages(msg_type: IntOut
+              ${after !== "" ? 'after: "' + after + '"' : ""}
+            ) {
+              pageInfo {
+                startCursor
+                endCursor
+                hasNextPage
+              }
+              edges {
+                node {        
+                  dst
+                  created_at_string
+                }
+                
+              }
+            }
+          }
+        }
+      }
+      
+      ` })).result.data.blockchain.account.messages;
+    return r;
+  } catch (e) {
+    console.log(e);
+  }
+}

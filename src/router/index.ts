@@ -19,6 +19,11 @@ const routes: Array<RouteConfig> = [
     path: '/image/:fileId',
     name: 'imageView',    
     component: () => import('../views/ImageView.vue')
+  },
+  {
+    path: '/uploaded',
+    name: 'uploadedView',    
+    component: () => import('../views/UploadedView.vue')
   }
 ]
 

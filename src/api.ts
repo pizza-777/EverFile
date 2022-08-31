@@ -4,7 +4,7 @@ import {
   ReadonlyAbiParam
 } from 'everscale-inpage-provider';
 
-import { firstTransactionBody, fileBody } from '@/graphQl';
+import { firstTransactionBody, fileBody, uploadedFiles } from '@/graphQl';
 
 import { ConnectionProperties, EverscaleStandaloneClient } from 'everscale-standalone-client';
 
@@ -268,4 +268,10 @@ export async function authState(): Promise<boolean | string> {
   }
 
   return state.permissions.accountInteraction.address.toString();
+}
+
+export const uploadedFilesList = async (fileId: string) => {
+
+  const messages = await uploadedFiles("");
+  return messages?.edges
 }

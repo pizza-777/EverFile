@@ -43,6 +43,9 @@
         </div>
       </div>
     </div>
+    <div variant="outline-secondary" class="text-center mt-2" style="text-align: center">
+      <a href="./#/uploaded" class="link-secondary">Uploaded files</a>
+    </div>
   </div>
 </template>
 <script lang="ts">
