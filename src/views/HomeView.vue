@@ -1,5 +1,6 @@
 <template>
   <div>
+    <div><LoginLogout :authProp="authTrigger" /></div>
     <div class="container mt-5">
       <div class="row">
         <div class="col-md-12">
@@ -47,6 +48,7 @@
 <script lang="ts">
 import Vue from 'vue'
 import { returnChange, uploadFile, uploadChunk, createChunks } from '@/api.ts'
+import LoginLogout from '@/components/LoginLogout.vue'
 
 export default Vue.extend({
   name: 'HomeView',
@@ -59,6 +61,7 @@ export default Vue.extend({
       showProgress: false, //show progress bar
       disableInputs: false, //disable inputs
       btnLoader: false, //show loader on button
+      authTrigger: false,
     }
   },
   methods: {
@@ -113,6 +116,9 @@ export default Vue.extend({
       document.getElementById('fileUpload').value = ''
       this.fileAddress = fileAddress
     },
+  },
+  components: {
+    LoginLogout,
   },
 })
 

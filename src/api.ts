@@ -245,3 +245,27 @@ export async function createHash(s: string) {
     }).call()
   return hash.value0
 }
+
+export async function login() {
+  await everWallet()
+  const _ever = await ever();
+  await _ever.ensureInitialized()
+}
+
+export async function logout() {
+  const _ever = await ever();
+  _ever.disconnect();
+  _accountInteraction = undefined
+}
+
+export async function authState(): Promise<boolean | string> {
+  const _ever = await ever();
+
+  const state = await _ever.getProviderState()
+
+  if (typeof state.permissions.accountInteraction === 'undefined') {
+    return false
+  }
+
+  return state.permissions.accountInteraction.address.toString();
+}
