@@ -18,7 +18,7 @@
         <hr />
         <b-card-text><b>type</b>: {{ file.file_type }}</b-card-text>
         <hr />
-        <b-button variant="outline-secondary" @click="_download()">         
+        <b-button variant="outline-secondary" @click="_download()" :disabled="btnLoader">         
           Download
            <b-spinner style="margin-left: 0.3em" v-if="btnLoader" small></b-spinner>
         </b-button>
