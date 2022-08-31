@@ -18,8 +18,11 @@
         <hr />
         <b-card-text><b>type</b>: {{ file.file_type }}</b-card-text>
         <hr />
-        <b-button variant="outline-secondary" @click="_download()">Download</b-button>
-        <b-link class="text-secondary ms-3" v-if="isImage" :href="'./#/image/'+this.$route.params.fileId" target="_blank">
+        <b-button variant="outline-secondary" @click="_download()">         
+          Download
+           <b-spinner style="margin-left: 0.3em" v-if="btnLoader" small></b-spinner>
+        </b-button>
+        <b-link class="text-secondary ms-3" v-if="isImage" :href="'./#/image/' + this.$route.params.fileId" target="_blank">
           <span class="me-2">Open</span>
           <span>
             <b-icon-box-arrow-up-right></b-icon-box-arrow-up-right>
@@ -34,8 +37,6 @@ import Vue from 'vue'
 import { getFileInfo } from '@/api'
 import { downloadFile } from '@/api'
 import download from 'downloadjs'
-
-
 
 //convert bytes to human readable format
 function bytesToSize(bytes) {
@@ -53,12 +54,15 @@ export default Vue.extend({
       humanFileSize: false,
       show: false,
       isImage: false,
+      btnLoader: false,
     }
   },
   methods: {
     async _download() {
       if (!this.file) return
+      this.btnLoader = true
       const base64 = await downloadFile(this.$route.params.fileId)
+      this.btnLoader = false
       download(base64, this.file.file_name, this.file.file_type)
     },
     async showImage() {
