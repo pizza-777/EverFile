@@ -27,11 +27,12 @@ contract File {
 
   function uploadChunk(string chunk, string chunkNumber) public {
     uint32 chunkNumberNumeric = uint32(stoi(chunkNumber).get());
-    require((chunkNumberNumeric + 1) > ((chunksCounter / 10) * 10), 101, 'Chunk alredy exists');
-    require(chunks.add(chunkNumberNumeric, true), 101, 'Chunk already exists');
+    require((chunkNumberNumeric + 1) > ((chunksCounter / 50) * 50), 101, 'Chunk alredy exists');
+    require(chunks.exists(chunkNumberNumeric) == false, 101, 'Chunk already exists');
     tvm.accept();
+    chunks.add(chunkNumberNumeric, true);
     chunksCounter++;
-    if (chunksCounter % 10 == 0) {
+    if (chunksCounter % 50 == 0) {
       mapping(uint32 => bool) empty;
       chunks = empty;
     }
