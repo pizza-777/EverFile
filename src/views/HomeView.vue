@@ -41,7 +41,7 @@
       </div>
     </div>
     <div variant="outline-secondary" class="text-center mt-2" style="text-align: center">
-      <a href="./#/uploaded" class="link-secondary">Uploaded files</a>
+      <a href="./#/uploaded" class="link-secondary"><b>Uploaded files</b></a>
     </div>
   </div>
 </template>
