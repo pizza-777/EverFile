@@ -17,13 +17,10 @@
                 </div>
               </div>
               <div class="row mt-4">
-                <div class="col-md-12">
-                  <b-button variant="outline-secondary" @click="_uploadFile()" :disabled="disableInputs">
-                    Upload
-                    <b-spinner style="margin-left: 0.3em" v-if="btnLoader" small></b-spinner>
-                  </b-button>
+                <div>
                   <span style="margin-left: 0.4em" v-if="btnLoader" class="text-secondary">prepearing ... </span>
                   <span style="margin-left: 0.4em" v-if="showProgress" class="text-secondary">uploading ... </span>
+                  <b-spinner style="margin-left: 0.3em" v-if="btnLoader" small variant="secondary"></b-spinner>
                 </div>
               </div>
               <div class="row mt-4" v-if="showProgress">
@@ -31,7 +28,7 @@
                   <b-progress variant="secondary" :value="value" :max="max" show-progress animated></b-progress>
                 </div>
               </div>
-              <div class="row mt-4">
+              <div class="row mt-3">
                 <div class="col-md-12">
                   <div variant="outline-secondary">
                     <a v-if="fileAddress" :href="'./#/file/' + fileAddress" class="link-secondary">Go to file</a>
@@ -70,6 +67,7 @@ export default Vue.extend({
   methods: {
     loadFile(ev) {
       this.file = ev.target.files[0]
+      this._uploadFile()
     },
     async _uploadFile() {
       if (this.file == false) {
