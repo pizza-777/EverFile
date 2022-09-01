@@ -22,7 +22,7 @@
           Download
           <b-spinner style="margin-left: 0.3em" v-if="btnLoader" small></b-spinner>
         </b-button>
-        <b-link class="text-secondary ms-3" v-if="isImage" :href="'./#/image/' + this.$route.params.fileId" target="_blank">
+        <b-link class="text-secondary ms-3" v-if="openFileLink" :href="'./#/' + fileType + '/' + this.$route.params.fileId" target="_blank">
           <span class="me-2">Open</span>
           <span>
             <b-icon-box-arrow-up-right></b-icon-box-arrow-up-right>
@@ -54,7 +54,8 @@ export default Vue.extend({
       file: false,
       humanFileSize: false,
       show: false,
-      isImage: false,
+      openFileLink: false,
+      fileType: '',
       btnLoader: false,
       explorer: config.network.broxus == 'testnet' ? 'net.ever.live' : 'ever.live',
     }
@@ -67,15 +68,6 @@ export default Vue.extend({
       this.btnLoader = false
       download(base64, this.file.file_name, this.file.file_type)
     },
-    async showImage() {
-      const data = await downloadFile(this.$route.params.fileId)
-      var image = new Image()
-      image.src = data
-
-      var w = window.open('')
-      w.document.write(image.outerHTML)
-      w.document.close()
-    },
   },
   mounted() {
     getFileInfo(this.$route.params.fileId).then((file) => {
@@ -86,7 +78,11 @@ export default Vue.extend({
         this.file = file
         this.humanFileSize = bytesToSize(file.file_size)
         this.show = true
-        this.isImage = file.file_type.includes('image')
+        const fileType = file.file_type.match(/html|image/)
+        if (fileType !== null) {
+          this.openFileLink = true
+          this.fileType = fileType[0]
+        }
       }
     })
   },
