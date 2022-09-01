@@ -1,2 +1,0 @@
-"use strict";(self["webpackChunkever_file"]=self["webpackChunkever_file"]||[]).push([[236],{2236:function(e,n,t){t.r(n),t.d(n,{default:function(){return f}});var u=function(){var e=this,n=e._self._c;e._self._setupProxy;return n("div")},r=[],l=t(6369),a=t(2791),i=l["default"].extend({name:"ImageView",data(){return{}},mounted(){(0,a.Sv)(this.$route.params.fileId).then((e=>{var n=new Image;n.src=e,window.document.write(n.outerHTML),window.document.close()}))}}),s=i,o=t(1001),d=(0,o.Z)(s,u,r,!1,null,null,null),f=d.exports}}]);
-//# sourceMappingURL=236.f9274091.js.map
