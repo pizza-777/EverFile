@@ -73,7 +73,7 @@ export const fileBody = async (fileAddr: string, after: string): Promise<Blockch
 }
 
 
-export const uploadedFiles = async (after: string): Promise<BlockchainMessages | undefined> => {
+export const uploadedFiles = async (before: string): Promise<BlockchainMessages | undefined> => {
   try {
     const r = (await client.net.query({
       "query": `{
@@ -82,7 +82,8 @@ export const uploadedFiles = async (after: string): Promise<BlockchainMessages |
             address: "${config.fileDeployer}"
           ) {
             messages(msg_type: IntOut
-              ${after !== "" ? 'after: "' + after + '"' : ""}
+              last: 50
+              ${before !== "" ? 'before: "' + before + '"' : ""}
             ) {
               pageInfo {
                 startCursor

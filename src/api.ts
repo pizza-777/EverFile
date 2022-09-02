@@ -275,7 +275,7 @@ export async function authState(): Promise<boolean | string> {
 export const uploadedFilesList = async (fileId: string) => {
 
   const messages = await uploadedFiles("");
-  return messages?.edges
+  return messages?.edges.reverse()
 }
 
 //watching for network changes and pass them to the Vue app
