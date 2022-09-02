@@ -6,7 +6,7 @@
         <div class="col-md-12">
           <div class="card">
             <div class="card-header">
-              <h4 class="card-title">Upload file</h4>
+              <h4 class="card-title text-secondary">Upload file</h4>
             </div>
             <div class="card-body">
               <div class="row" v-if="showInput">
