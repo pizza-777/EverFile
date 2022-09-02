@@ -5,7 +5,7 @@
         <b-navbar-brand>Uploaded files</b-navbar-brand>
       </b-navbar>
     </div>
-    <b-table striped hover :items="items">
+    <b-table hover :items="items" class="text-secondary">
       <template #cell(Address)="data">
         <span v-html="data.value"></span>
       </template>
