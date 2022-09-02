@@ -9,7 +9,7 @@
               <h4 class="card-title">Upload file</h4>
             </div>
             <div class="card-body">
-              <div class="row">
+              <div class="row" v-if="showInput">
                 <div class="col-md-12">
                   <div class="form-group">
                     <input type="file" class="form-control" id="fileUpload" name="fileUpload" @change="loadFile" :disabled="disableInputs" />
@@ -28,13 +28,14 @@
                   <b-progress variant="secondary" :value="value" :max="max" show-progress animated></b-progress>
                 </div>
               </div>
-              <div class="row mt-3">
+              <div class="row">
                 <div class="col-md-12">
                   <div variant="outline-secondary">
                     <a v-if="fileAddress" :href="'./#/file/' + fileAddress" class="link-secondary">Go to file</a>
                   </div>
                 </div>
               </div>
+              <div v-if="showAlert" class="alert alert-secondary" role="alert">{{ alertContent }}</div>
             </div>
           </div>
         </div>
@@ -47,8 +48,9 @@
 </template>
 <script lang="ts">
 import Vue from 'vue'
-import { returnChange, uploadFile, uploadChunk, createChunks } from '@/api.ts'
+import { returnChange, uploadFile, uploadChunk, createChunks, getNetwork } from '@/api.ts'
 import LoginLogout from '@/components/LoginLogout.vue'
+import { config } from '@/config'
 
 export default Vue.extend({
   name: 'HomeView',
@@ -60,8 +62,11 @@ export default Vue.extend({
       value: 0, //progress bar value
       showProgress: false, //show progress bar
       disableInputs: false, //disable inputs
+      showInput: true,
       btnLoader: false, //show loader on button
       authTrigger: false,
+      showAlert: false,
+      alertContent: '',
     }
   },
   methods: {
@@ -117,9 +122,30 @@ export default Vue.extend({
       document.getElementById('fileUpload').value = ''
       this.fileAddress = fileAddress
     },
+    controlNetwork() {
+      if (this.$network !== config.network.broxus) {
+        this.showAlert = true
+        this.alertContent = 'This project is currently working in ' + config.network.broxus + '. Switch your EverWallet to this network.'
+        this.showInput = false
+      } else {
+        this.showAlert = false
+        this.showInput = true
+      }
+    },
   },
   components: {
     LoginLogout,
+  },
+  watch: {
+    $network() {
+      this.controlNetwork()
+    },
+  },
+  mounted() {
+    getNetwork().then((network) => {
+      this.$network = network
+      this.controlNetwork()
+    })
   },
 })
 

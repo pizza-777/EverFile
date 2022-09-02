@@ -16,6 +16,8 @@ import { UtilsContract } from '@/contracts/UtilsContract';
 
 import { config } from '@/config';
 
+import Vue from 'vue'
+
 let _ever: ProviderRpcClient;
 let _accountInteraction: everWallet | undefined;
 
@@ -275,3 +277,32 @@ export const uploadedFilesList = async (fileId: string) => {
   const messages = await uploadedFiles("");
   return messages?.edges
 }
+
+//watching for network changes and pass them to the Vue app
+const vueGlobal = Vue.observable({ network: '' })
+
+Object.defineProperty(Vue.prototype, '$network', {
+  get() {
+    return vueGlobal.network
+  },
+
+  set(value) {
+    vueGlobal.network = value
+  }
+});
+
+ever().then(async (_ever) => {
+  (await _ever.subscribe('networkChanged')).on('data', (event: { selectedConnection: any; }) => {
+    vueGlobal.network = event.selectedConnection;
+  });
+})
+
+export async function getNetwork(): Promise<'mainnet' | 'testnet'> {
+  const _ever = await ever();
+  const ps = await _ever.getProviderState();
+  const networks = ['mainnet', 'testnet'] as const
+  return networks[ps.networkId - 1]
+}
+
+
+
