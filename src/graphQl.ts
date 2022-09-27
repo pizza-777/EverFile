@@ -6,15 +6,12 @@ libWebSetup({
   binaryURL: "./eversdk.wasm",
 });
 
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-//@ts-ignore
 TonClient.useBinaryLibrary(libWeb);
 const client = new TonClient({
   network: {
     endpoints:[
       "devnet.evercloud.dev/d194af39b9d24ef89707c161b679eabf"
-    ]
-    
+    ]    
   },  
 });
 
