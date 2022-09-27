@@ -1,9 +1,9 @@
-import { TonClient } from "@tonclient/core";
-import { libWeb, libWebSetup } from "@tonclient/lib-web";
+import { TonClient } from "@eversdk/core";
+import { libWeb, libWebSetup } from "@eversdk/lib-web";
 import { config } from './config';
 
 libWebSetup({
-  binaryURL: "./tonclient.wasm",
+  binaryURL: "./eversdk.wasm",
 });
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -11,8 +11,11 @@ libWebSetup({
 TonClient.useBinaryLibrary(libWeb);
 const client = new TonClient({
   network: {
-    server_address: config.network.everx,
-  }
+    endpoints:[
+      "devnet.evercloud.dev/d194af39b9d24ef89707c161b679eabf"
+    ]
+    
+  },  
 });
 
 export const firstTransactionBody = async (fileAddr: string): Promise<string | undefined> => {
