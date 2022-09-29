@@ -24,7 +24,15 @@ let _accountInteraction: everWallet | undefined;
 const _everStandalone = new ProviderRpcClient({
   fallback: () =>
     EverscaleStandaloneClient.create({
-      connection: config.network.broxus as ConnectionProperties,
+      connection: {
+        id: 1,
+        group: 'testnet',
+        type: 'graphql',
+        data: {
+          endpoints: config.endpoints,
+          local: false,
+        }
+      } as ConnectionProperties,
     }),
   forceUseFallback: true,
 });

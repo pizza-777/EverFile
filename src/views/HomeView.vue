@@ -123,9 +123,9 @@ export default Vue.extend({
       this.fileAddress = fileAddress
     },
     controlNetwork() {
-      if (this.$network !== config.network.broxus) {
+      if (this.$network !== config.network) {
         this.showAlert = true
-        this.alertContent = 'This project is currently working in ' + config.network.broxus + '. Switch your EverWallet to this network.'
+        this.alertContent = 'This project is currently working in ' + config.network + '. Switch your EverWallet to this network.'
         this.showInput = false
       } else {
         this.showAlert = false
