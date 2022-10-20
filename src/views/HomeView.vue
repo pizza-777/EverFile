@@ -96,7 +96,7 @@ export default Vue.extend({
         console.warn(e.message)
       }
 
-      const chunks = createChunks(base64, 15000)
+      const chunks = createChunks(base64, 50000)// max size is up to 64kb
       this.btnLoader = false
       this.showProgress = true
 
