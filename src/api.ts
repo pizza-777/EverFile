@@ -305,11 +305,10 @@ ever().then(async (_ever) => {
   });
 })
 
-export async function getNetwork(): Promise<'mainnet' | 'testnet'> {
+export async function getNetwork(): Promise<string> {
   const _ever = await ever();
   const ps = await _ever.getProviderState();
-  const networks = ['mainnet', 'testnet'] as const
-  return networks[ps.networkId - 1]
+  return ps.selectedConnection
 }
 
 
